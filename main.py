@@ -87,9 +87,13 @@ class MainApplication(tk.Frame, Consultar):
         # self.__read_pandas()
         self.main_file = self._select_path_if_not_exists()
         self.headers_plan.listbox.delete(0, 1000)  # deleta do 0 até o 1000...
+        # deleta do 0 até o 1000...
+        self.selected_client.listbox.delete(0, 1000)
 
         for val in self.get_fieldnames():
             self.headers_plan.listbox.insert('end', val or 123)
+        for val in self.clients_list():
+            self.selected_client.listbox.insert('end', val or 123)
 
     def get_copia(self, campo: str):
         __vgot = campo
@@ -173,5 +177,5 @@ if __name__ == "__main__":
     b = MainApplication(root)
     b.pack(side="top", fill="both", expand=True)
 
-    root.geometry('500x500')
+    root.geometry('500x510')
     root.mainloop()

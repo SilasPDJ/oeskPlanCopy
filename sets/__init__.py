@@ -1,9 +1,14 @@
 import os
+# pyinstaller .\main.py
+# pyinstaller -F --noconsole --paths=venv\Lib\site-packages main.py
+
+# -F já é onefile
 
 
 class Initial:
-    main_path = os.path.dirname(os.path.realpath(__file__))
-    main_path += '\with_titlePATH.txt'
+    # main_path = os.path.dirname(os.path.realpath(__file__))
+    main_path = ""
+    main_path += 'with_titlePATH.txt'
 
     def getset_folderspath(self, folder_path_only=True):
         """Seleciona onde estão as pastas e planihas
@@ -17,6 +22,7 @@ class Initial:
         try:
             with open(self.main_path) as f:
                 returned = f.read()
+                returned = returned.replace('"', '')
         except FileNotFoundError:
             returned = self._select_path_if_not_exists()
 
