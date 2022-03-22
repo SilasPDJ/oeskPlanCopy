@@ -5,6 +5,8 @@ from threading import Thread
 from tkinter import filedialog
 import pandas as pd
 from sets import Initial
+# ESSA VERSÃO POSSO ATUALIZAR ELA PARA O PROGRAMA OESK
+# CONSULTAR = BACKEND
 
 
 class Consultar(Initial):
@@ -46,7 +48,7 @@ class Consultar(Initial):
             return clientid
 
     def __read_pandas(self):
-        filename = Initial.getset_folderspath(False)
+        filename = Initial().getset_folderspath(False)
 
         shname = "OESK"
         main_pandas = pd.read_excel(
@@ -67,11 +69,9 @@ class MainApplication(tk.Frame, Consultar):
         self.headers_plan = ttkac.AutocompleteEntryListbox(
             self.root, self.get_fieldnames())
 
-        self.selected_client = ttkac.AutocompleteEntry(
+        self.selected_client = ttkac.AutocompleteEntryListbox(
             self.root, self.clients_list())
 
-        bt_abre_pasta = self.button(
-            'Abre e copia pasta de: ', self.abre_pasta, 'black', 'lightblue')
         bt_copia = self.button(
             'Copia Campo', lambda: self.get_copia(self.headers_plan.get()
                                                   ), 'black', 'lightblue')
@@ -85,26 +85,13 @@ class MainApplication(tk.Frame, Consultar):
 
     def select_path(self):
         # self.__read_pandas()
-
         self.main_file = self._select_path_if_not_exists()
         self.headers_plan.listbox.delete(0, 1000)  # deleta do 0 até o 1000...
 
         for val in self.get_fieldnames():
             self.headers_plan.listbox.insert('end', val or 123)
 
-    def abre_pasta(self):
-        import subprocess
-        # folder = "\\".join(main_folder.split('/')[:-1])
-        # folder = os.path.join(
-        #     folder, COMPT[3:], COMPT, self.selected_client.get())
-        # if not os.path.exists(folder):
-        #     os.makedirs(folder)
-        # subprocess.Popen(f'explorer "{folder}"')
-        # clipboard.copy(folder)
-        # self.selected_client
-
     def get_copia(self, campo: str):
-
         __vgot = campo
         self.__get_dataclipboard(__vgot)
         # getfieldnames()
@@ -117,10 +104,8 @@ class MainApplication(tk.Frame, Consultar):
         indcampo = self.get_fieldnames().index(campo)
 
         cnpjs = list(self.clients_list(indcampo))
-        print(self.selected_client)
-        input(cnpjs)
-        whoses = list(self.get_clienid())
-        whoindex = whoses.index(whoses_cnpj)
+        whoindex = self.get_clienid(self.selected_client.get())
+
         clipboard.copy(cnpjs[whoindex])
         return cnpjs[whoindex]
     # Elements and placements
@@ -188,5 +173,5 @@ if __name__ == "__main__":
     b = MainApplication(root)
     b.pack(side="top", fill="both", expand=True)
 
-    root.geometry('500x800')
+    root.geometry('500x500')
     root.mainloop()

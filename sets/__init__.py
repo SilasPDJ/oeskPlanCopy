@@ -5,8 +5,7 @@ class Initial:
     main_path = os.path.dirname(os.path.realpath(__file__))
     main_path += '\with_titlePATH.txt'
 
-    @classmethod
-    def getset_folderspath(cls, folder_path_only=True):
+    def getset_folderspath(self, folder_path_only=True):
         """Seleciona onde estão as pastas e planihas
 
         Returns:
@@ -16,10 +15,10 @@ class Initial:
         # os.path.dirname(filepath)
         returned = False
         try:
-            with open(cls.main_path) as f:
+            with open(self.main_path) as f:
                 returned = f.read()
         except FileNotFoundError:
-            returned = cls._select_path_if_not_exists()
+            returned = self._select_path_if_not_exists()
 
         if returned and folder_path_only:
             returned = os.path.dirname(returned)
