@@ -1,4 +1,5 @@
 import tkinter as tk
+from turtle import width
 from ttkwidgets import autocomplete as ttkac
 import clipboard
 from threading import Thread
@@ -66,6 +67,7 @@ class Consultar(Initial):
 
 
 class MainApplication(tk.Frame, Consultar):
+    default_font = ("Currier", 12)
 
     def __init__(self, parent, *args, **kwargs):
         # ---- init
@@ -77,7 +79,7 @@ class MainApplication(tk.Frame, Consultar):
 
         # ---- lambda methods
         def increment_header_tip(tip, fg="#000"): LABELS.append(
-            tk.Label(root, text=tip, font=("Currier", 12), fg=fg))
+            tk.Label(root, text=tip, font=self.default_font, fg=fg))
 
         def copia_command(e=None): return self.__get_dataclipboard(
             self.headers_plan.get())
@@ -86,6 +88,8 @@ class MainApplication(tk.Frame, Consultar):
             "PRESSIONE F2 PARA COPIAR O CAMPO SELECIONADO", "#ff523d")
 
         # gui ----------
+        self.outputwb_formated = tk.BooleanVar()
+
         self.headers_plan = ttkac.AutocompleteEntryListbox(
             self.root, self.get_fieldnames())
 
@@ -95,7 +99,10 @@ class MainApplication(tk.Frame, Consultar):
             'Copia Campo', copia_command, 'black', 'lightblue')
         seleciona_planilha = self.button(
             'Seleciona planilha', self.select_path, 'black', 'lightblue')
-        self.__pack(*LABELS, self.selected_client, bt_copia,
+        self.__pack(*LABELS, self.selected_client)
+        self.__pack(self.radiobutton4format(), x=50, y=2,
+                    fill=tk.Y)  # centralizou com fill Y
+        self.__pack(bt_copia,
                     seleciona_planilha, self.headers_plan,)
         # self.__pack(self.selected_client, excel_col)
 
@@ -107,26 +114,43 @@ class MainApplication(tk.Frame, Consultar):
     # functions
 
     def __get_dataclipboard(self, campo: str):
-        self.mask_cnpjcpf = True
 
         indcampo = self.get_fieldnames().index(campo)
         selected_list_values = list(
             self.any_to_str(*self.clients_list(indcampo)))
 
         whoindex = self.get_clienid(self.selected_client.get())
-        resultado = str(selected_list_values[whoindex])
+        returned = str(selected_list_values[whoindex])
 
-        if self.mask_cnpjcpf and (campo.upper() == 'CNPJ' or campo.upper() == 'CPF'):
-            if len(resultado) == 11:
-                resultado = "%s%s%s.%s%s%s.%s%s%s-%s%s" % tuple(resultado)
-            else:
-                input(len(resultado))
-                resultado = "%s%s.%s%s%s.%s%s%s/%s%s%s%s-%s%s" % tuple(
-                    resultado)
+        can_format = self.outputwb_formated.get()
+        if ('CNPJ' in campo.upper() or 'CPF' in campo.upper()):
+            returned = "".join(n for n in returned if n.isnumeric())
+            if can_format:
+                if len(returned) == 11:
+                    returned = "%s%s%s.%s%s%s.%s%s%s-%s%s" % tuple(returned)
+                else:
+                    input(len(returned))
+                    returned = "%s%s.%s%s%s.%s%s%s/%s%s%s%s-%s%s" % tuple(
+                        returned)
 
-        clipboard.copy(resultado)
-        return resultado
+        clipboard.copy(returned)
+        return returned
     # Elements and placements
+
+    def radiobutton4format(self) -> tuple:
+        # com frame
+        height, width = 10, 20
+        frame = tk.Frame(self.root, bg="green")
+
+        rb1 = tk.Radiobutton(frame, text="formatado",
+                             variable=self.outputwb_formated, value=True, font=self.default_font)
+        rb2 = tk.Radiobutton(frame, text="não formatado",
+                             variable=self.outputwb_formated, value=False, font=self.default_font)
+
+        rb1.grid(row=0)
+        rb2.grid(row=0, column=1)
+
+        return frame
 
     @ staticmethod
     def __pack(*els, x=50, y=10, fill='x', side=tk.TOP, expand=0):
