@@ -5,6 +5,9 @@ from threading import Thread
 from tkinter import filedialog
 import pandas as pd
 from sets import Initial
+
+import sys
+import os
 # ESSA VERSÃO POSSO ATUALIZAR ELA PARA O PROGRAMA OESK
 # CONSULTAR = BACKEND
 
@@ -55,6 +58,12 @@ class Consultar(Initial):
             filename, sheet_name=shname or shname.lower(), dtype=str)
         return main_pandas
 
+    def select_path(self):
+        # self.__read_pandas()
+        self.main_file = self._select_path_if_not_exists()
+        python = sys.executable
+        os.execl(python, python, * sys.argv)
+
 
 class MainApplication(tk.Frame, Consultar):
 
@@ -96,14 +105,6 @@ class MainApplication(tk.Frame, Consultar):
         self.selected_client.listbox.selection_set(0)
 
     # functions
-
-    def select_path(self):
-        import sys
-        from os import execl
-        # self.__read_pandas()
-        self.main_file = self._select_path_if_not_exists()
-        python = sys.executable
-        execl(python, python, * sys.argv)
 
     def __get_dataclipboard(self, campo: str):
         self.mask_cnpjcpf = True
