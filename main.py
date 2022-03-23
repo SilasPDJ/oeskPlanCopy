@@ -52,7 +52,7 @@ class Consultar(Initial):
 
         shname = "OESK"
         main_pandas = pd.read_excel(
-            filename, sheet_name=shname or shname.lower())
+            filename, sheet_name=shname or shname.lower(), dtype=str)
         return main_pandas
 
 
@@ -70,7 +70,7 @@ class MainApplication(tk.Frame, Consultar):
         def increment_header_tip(tip, fg="#000"): LABELS.append(
             tk.Label(root, text=tip, font=("Currier", 12), fg=fg))
 
-        def copia_command(e=None): return self.get_copia(
+        def copia_command(e=None): return self.__get_dataclipboard(
             self.headers_plan.get())
 
         increment_header_tip(
@@ -98,30 +98,33 @@ class MainApplication(tk.Frame, Consultar):
     # functions
 
     def select_path(self):
+        import sys
+        from os import execl
         # self.__read_pandas()
         self.main_file = self._select_path_if_not_exists()
-        self.headers_plan.listbox.delete(0, 1000)  # deleta do 0 até o 1000...
-        # deleta do 0 até o 1000...
-        self.selected_client.listbox.delete(0, 1000)
-
-        for val in self.get_fieldnames():
-            self.headers_plan.listbox.insert('end', val or 123)
-        for val in self.clients_list():
-            self.selected_client.listbox.insert('end', val or 123)
-
-    def get_copia(self, campo: str):
-        __vgot = campo
-        self.__get_dataclipboard(__vgot)
-        # getfieldnames()
+        python = sys.executable
+        execl(python, python, * sys.argv)
 
     def __get_dataclipboard(self, campo: str):
+        self.mask_cnpjcpf = True
+
         indcampo = self.get_fieldnames().index(campo)
+        selected_list_values = list(
+            self.any_to_str(*self.clients_list(indcampo)))
 
-        cnpjs = list(self.clients_list(indcampo))
         whoindex = self.get_clienid(self.selected_client.get())
+        resultado = str(selected_list_values[whoindex])
 
-        clipboard.copy(cnpjs[whoindex])
-        return cnpjs[whoindex]
+        if self.mask_cnpjcpf and (campo.upper() == 'CNPJ' or campo.upper() == 'CPF'):
+            if len(resultado) == 11:
+                resultado = "%s%s%s.%s%s%s.%s%s%s-%s%s" % tuple(resultado)
+            else:
+                input(len(resultado))
+                resultado = "%s%s.%s%s%s.%s%s%s/%s%s%s%s-%s%s" % tuple(
+                    resultado)
+
+        clipboard.copy(resultado)
+        return resultado
     # Elements and placements
 
     @ staticmethod
