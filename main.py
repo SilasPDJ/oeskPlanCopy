@@ -59,28 +59,42 @@ class Consultar(Initial):
 class MainApplication(tk.Frame, Consultar):
 
     def __init__(self, parent, *args, **kwargs):
+        # ---- init
         super().__init__(*args, **kwargs)
         Consultar().__init__()
-        # lista_de_dados = self.GET_clien_DATA(self.get_clienid("Nome5"))
-
+        LABELS = []
         self.parent = parent
         self.root = parent
 
+        # ---- lambda methods
+        def increment_header_tip(tip, fg="#000"): LABELS.append(
+            tk.Label(root, text=tip, font=("Currier", 12), fg=fg))
+
+        def copia_command(e=None): return self.get_copia(
+            self.headers_plan.get())
+
+        increment_header_tip(
+            "PRESSIONE F2 PARA COPIAR O CAMPO SELECIONADO", "#ff523d")
+
+        # gui ----------
         self.headers_plan = ttkac.AutocompleteEntryListbox(
             self.root, self.get_fieldnames())
 
         self.selected_client = ttkac.AutocompleteEntryListbox(
             self.root, self.clients_list())
-
         bt_copia = self.button(
-            'Copia Campo', lambda: self.get_copia(self.headers_plan.get()
-                                                  ), 'black', 'lightblue')
+            'Copia Campo', copia_command, 'black', 'lightblue')
         seleciona_planilha = self.button(
             'Seleciona planilha', self.select_path, 'black', 'lightblue')
-        self.__pack(self.selected_client, bt_copia,
+        self.__pack(*LABELS, self.selected_client, bt_copia,
                     seleciona_planilha, self.headers_plan,)
-
         # self.__pack(self.selected_client, excel_col)
+
+        # ---- create shortcuts
+        root.bind("<F2>", copia_command)
+        self.headers_plan.listbox.selection_set(0)
+        self.selected_client.listbox.selection_set(0)
+
     # functions
 
     def select_path(self):
@@ -101,10 +115,6 @@ class MainApplication(tk.Frame, Consultar):
         # getfieldnames()
 
     def __get_dataclipboard(self, campo: str):
-        whoses_cnpj = self.selected_client.get()
-        if whoses_cnpj == '':
-            whoses_cnpj = 'Oesk Contabil'
-
         indcampo = self.get_fieldnames().index(campo)
 
         cnpjs = list(self.clients_list(indcampo))
@@ -177,5 +187,5 @@ if __name__ == "__main__":
     b = MainApplication(root)
     b.pack(side="top", fill="both", expand=True)
 
-    root.geometry('500x510')
+    root.geometry('530x560')
     root.mainloop()
