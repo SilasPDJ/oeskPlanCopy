@@ -58,9 +58,13 @@ class Consultar(Initial):
         shname = "OESK"
         df = main_pandas = pd.read_excel(
             filename, sheet_name=shname or shname.lower(), dtype=str)
-        if upper:
-            main_pandas = main_pandas.apply(
-                lambda x: x.astype(str).str.upper())
+        if upper is not None:  # then normal cased
+            if upper is False:  # then lower cased
+                main_pandas = main_pandas.apply(
+                    lambda x: x.astype(str).str.lower())
+            else:  # then upper cased
+                main_pandas = main_pandas.apply(
+                    lambda x: x.astype(str).str.upper())
             main_pandas.columns = main_pandas.columns.str.upper()
             # apply to be upper case
         return main_pandas
@@ -113,6 +117,11 @@ class MainApplication(tk.Frame, Consultar):
                     seleciona_planilha, self.headers_plan,)
         # self.__pack(self.selected_client, excel_col)
 
+        # ---- create bind methods
+        self.selected_client.entry.bind(
+            "<KeyPress>", lambda event, arg=self.selected_client: self.__entrywrite(event, arg))
+        self.headers_plan.entry.bind(
+            "<KeyPress>", lambda event, arg=self.headers_plan: self.__entrywrite(event, arg))
         # ---- create shortcuts
         self.root.bind("<F2>", copia_command)
         self.headers_plan.listbox.selection_set(0)
@@ -136,12 +145,17 @@ class MainApplication(tk.Frame, Consultar):
                 if len(returned) == 11:
                     returned = "%s%s%s.%s%s%s.%s%s%s-%s%s" % tuple(returned)
                 else:
-                    input(len(returned))
                     returned = "%s%s.%s%s%s.%s%s%s/%s%s%s%s-%s%s" % tuple(
                         returned)
 
         clipboard.copy(returned)
         return returned
+
+    def __entrywrite(self, e, elem):
+        # TODO: se for tudo lower, check se foi digitado upper...
+        if e.char.islower():
+            elem._listbox_keypress(e)
+
     # Elements and placements
 
     def radiobutton4format(self) -> tuple:
