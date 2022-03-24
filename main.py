@@ -122,13 +122,23 @@ class MainApplication(tk.Frame, Consultar):
             "<KeyPress>", lambda event, arg=self.selected_client: self.__entrywrite(event, arg))
         self.headers_plan.entry.bind(
             "<KeyPress>", lambda event, arg=self.headers_plan: self.__entrywrite(event, arg))
+
         # ---- create shortcuts
         self.root.bind("<F2>", copia_command)
+        self.set_initials()
+        bt_copia.focus()
+
+    def set_initials(self):
         self.headers_plan.listbox.selection_set(0)
         self.selected_client.listbox.selection_set(0)
 
-    # functions
+        cli = self.selected_client.listbox.get(0)
+        self.selected_client.entry.insert('end', cli)
 
+        hd = self.headers_plan.listbox.get(1)
+        self.headers_plan.entry.insert('end', hd)
+
+    # functions
     def __get_dataclipboard(self, campo: str):
 
         indcampo = self.get_fieldnames().index(campo)
@@ -163,13 +173,13 @@ class MainApplication(tk.Frame, Consultar):
         height, width = 10, 20
         frame = tk.Frame(self.root, bg="green")
 
-        rb1 = tk.Radiobutton(frame, text="formatado",
+        rb1 = tk.Radiobutton(frame, text="COM formatação",
                              variable=self.outputwb_formated, value=True, font=self.default_font)
-        rb2 = tk.Radiobutton(frame, text="não formatado",
+        rb2 = tk.Radiobutton(frame, text="SEM formatação",
                              variable=self.outputwb_formated, value=False, font=self.default_font)
 
-        rb1.grid(row=0)
-        rb2.grid(row=0, column=1)
+        rb2.grid(row=0)
+        rb1.grid(row=0, column=1)
 
         return frame
 
@@ -236,5 +246,5 @@ if __name__ == "__main__":
     b = MainApplication(root)
     b.pack(side="top", fill="both", expand=True)
 
-    root.geometry('530x560')
+    root.geometry('530x600')
     root.mainloop()
