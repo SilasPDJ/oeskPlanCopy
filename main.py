@@ -1,6 +1,7 @@
 import tkinter as tk
 from turtle import width
 from ttkwidgets import autocomplete as ttkac
+from ttkwidgets import UpperStringEntry
 import clipboard
 from threading import Thread
 from tkinter import filedialog
@@ -15,20 +16,20 @@ import os
 
 class Consultar(Initial):
 
-    def get_fieldnames(self):
-
-        fieldnames = list(self.__read_pandas().to_dict().keys())
-        return fieldnames
-
     @staticmethod
     def any_to_str(*args):
         for v in args:
             yield "".join(str(v))
 
+    def get_fieldnames(self) -> list:
+        fieldnames = list(self.__read_pandas().to_dict().keys())
+        return fieldnames
+
     def clients_list(self, get_campo=0) -> list:
         def __lsdv(dta): return list(dta.values())
         df = self.__read_pandas()
-        return list(__lsdv(df.to_dict())[get_campo].values())
+        dados = list(__lsdv(df.to_dict())[get_campo].values())
+        return dados
 
     def GET_clien_DATA(self, clid):
         # GET VALUES FROM SPECIFC CLIENT
@@ -51,12 +52,17 @@ class Consultar(Initial):
 
             return clientid
 
-    def __read_pandas(self):
+    def __read_pandas(self, upper=True):
         filename = Initial().getset_folderspath(False)
 
         shname = "OESK"
-        main_pandas = pd.read_excel(
+        df = main_pandas = pd.read_excel(
             filename, sheet_name=shname or shname.lower(), dtype=str)
+        if upper:
+            main_pandas = main_pandas.apply(
+                lambda x: x.astype(str).str.upper())
+            main_pandas.columns = main_pandas.columns.str.upper()
+            # apply to be upper case
         return main_pandas
 
     def select_path(self):
@@ -95,6 +101,7 @@ class MainApplication(tk.Frame, Consultar):
 
         self.selected_client = ttkac.AutocompleteEntryListbox(
             self.root, self.clients_list())
+
         bt_copia = self.button(
             'Copia Campo', copia_command, 'black', 'lightblue')
         seleciona_planilha = self.button(
@@ -107,7 +114,7 @@ class MainApplication(tk.Frame, Consultar):
         # self.__pack(self.selected_client, excel_col)
 
         # ---- create shortcuts
-        root.bind("<F2>", copia_command)
+        self.root.bind("<F2>", copia_command)
         self.headers_plan.listbox.selection_set(0)
         self.selected_client.listbox.selection_set(0)
 
