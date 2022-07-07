@@ -31,7 +31,7 @@ class Consultar(Initial):
         dados = list(__lsdv(df.to_dict())[get_campo].values())
         return dados
 
-    def GET_clien_DATA(self, clid):
+    def ___GET_clien_DATA(self, clid):
         # GET VALUES FROM SPECIFC CLIENT
         def __lsdv(dta): return list(dta.values())
         # list of dict values = lsdv meaning
@@ -93,10 +93,11 @@ class MainApplication(tk.Frame, Consultar):
 
         def copia_command(e=None): return self.__get_dataclipboard(
             self.headers_plan.get())
-
+        increment_header_tip("Planilhas estão dentro da pasta selecionada")
+        increment_header_tip(
+            "O nome da planilha usada pelo sistema é OESK")
         increment_header_tip(
             "PRESSIONE F2 PARA COPIAR O CAMPO SELECIONADO", "#ff523d")
-
         # gui ----------
         self.outputwb_formated = tk.BooleanVar()
 
@@ -110,11 +111,11 @@ class MainApplication(tk.Frame, Consultar):
             'Copia Campo', copia_command, 'black', 'lightblue')
         seleciona_planilha = self.button(
             'Seleciona planilha', self.select_path, 'black', 'lightblue')
-        self.__pack(*LABELS, self.selected_client)
+        self.__pack(*LABELS, self.headers_plan)
         self.__pack(self.radiobutton4format(), x=50, y=2,
                     fill=tk.Y)  # centralizou com fill Y
         self.__pack(bt_copia,
-                    seleciona_planilha, self.headers_plan,)
+                    seleciona_planilha, self.selected_client,)
         # self.__pack(self.selected_client, excel_col)
 
         # ---- create bind methods
@@ -246,5 +247,5 @@ if __name__ == "__main__":
     b = MainApplication(root)
     b.pack(side="top", fill="both", expand=True)
 
-    root.geometry('530x600')
+    root.geometry('530x700')
     root.mainloop()
