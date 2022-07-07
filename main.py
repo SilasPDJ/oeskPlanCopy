@@ -7,7 +7,7 @@ from threading import Thread
 from tkinter import filedialog
 import pandas as pd
 from sets import Initial
-
+from subprocess import Popen
 import sys
 import os
 # ESSA VERSÃO POSSO ATUALIZAR ELA PARA O PROGRAMA OESK
@@ -69,11 +69,15 @@ class Consultar(Initial):
             # apply to be upper case
         return main_pandas
 
-    def select_path(self):
+    def select_path(self, e=None):
         # self.__read_pandas()
         self.main_file = self._select_path_if_not_exists()
         python = sys.executable
         os.execl(python, python, * sys.argv)
+
+    def show_database(self, e=None):
+        path = Initial().getset_folderspath(False).replace('/', '\\')
+        return Popen(f'explorer /select,"{path}"')
 
 
 class MainApplication(tk.Frame, Consultar):
@@ -88,16 +92,20 @@ class MainApplication(tk.Frame, Consultar):
         self.root = parent
 
         # ---- lambda methods
-        def increment_header_tip(tip, fg="#000"): LABELS.append(
-            tk.Label(root, text=tip, font=self.default_font, fg=fg))
+        def increment_header_tip(tip, fg="#000", bg="#FFF"): LABELS.append(
+            tk.Label(root, text=tip, font=self.default_font, fg=fg, bg=bg))
 
         def copia_command(e=None): return self.__get_dataclipboard(
             self.headers_plan.get())
+
         increment_header_tip("Planilhas estão dentro da pasta selecionada")
         increment_header_tip(
             "O nome da planilha usada pelo sistema é OESK")
         increment_header_tip(
-            "PRESSIONE F2 PARA COPIAR O CAMPO SELECIONADO", "#ff523d")
+            "PRESSIONE F4 PARA COPIAR O CAMPO SELECIONADO", "#006400", "#ffff00")
+        increment_header_tip("PRESSIONE F2 p/ exibir a base de dados")
+        increment_header_tip(
+            "PRESSIONE F5 PARA TROCAR A BASE DE DADOS", "#ff523d")
         # gui ----------
         self.outputwb_formated = tk.BooleanVar()
 
@@ -125,7 +133,9 @@ class MainApplication(tk.Frame, Consultar):
             "<KeyPress>", lambda event, arg=self.headers_plan: self.__entrywrite(event, arg))
 
         # ---- create shortcuts
-        self.root.bind("<F2>", copia_command)
+        self.root.bind("<F4>", copia_command)
+        self.root.bind("<F5>", self.select_path)
+        self.root.bind("<F2>", self.show_database)
         self.set_initials()
         bt_copia.focus()
 
@@ -247,5 +257,5 @@ if __name__ == "__main__":
     b = MainApplication(root)
     b.pack(side="top", fill="both", expand=True)
 
-    root.geometry('530x700')
+    root.geometry('530x800')
     root.mainloop()
