@@ -2,6 +2,6 @@
 /*.xlsx
 /*__pycache__/
 /build/
-/dist/main
+/dist/
 /*.txt
-/dist/*.txt
+
