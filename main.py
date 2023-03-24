@@ -103,7 +103,8 @@ class MainApplication(tk.Frame, Consultar):
             "O nome da planilha usada pelo sistema é OESK")
         increment_header_tip(
             "PRESSIONE F4 PARA COPIAR O CAMPO SELECIONADO", "#006400", "#ffff00")
-        increment_header_tip("PRESSIONE F2 p/ exibir a base de dados")
+        increment_header_tip("PRESSIONE F1 p/ exibir a base de dados")
+        increment_header_tip("PRESSIONE F2 p / mudar o dado buscado")
         increment_header_tip(
             "PRESSIONE F5 PARA TROCAR A BASE DE DADOS", "#ff523d")
         # gui ----------
@@ -135,7 +136,8 @@ class MainApplication(tk.Frame, Consultar):
         # ---- create shortcuts
         self.root.bind("<F4>", copia_command)
         self.root.bind("<F5>", self.select_path)
-        self.root.bind("<F2>", self.show_database)
+        self.root.bind("<F1>", self.show_database)
+        self.root.bind("<F2>", self.__focus_client)
         self.set_initials()
         bt_copia.focus()
 
@@ -150,6 +152,10 @@ class MainApplication(tk.Frame, Consultar):
         self.headers_plan.entry.insert('end', hd)
 
     # functions
+    def __focus_client(self, E):
+        self.selected_client.entry.focus()
+        self.selected_client.entry.delete(0, 'end')
+
     def __get_dataclipboard(self, campo: str):
 
         indcampo = self.get_fieldnames().index(campo)
